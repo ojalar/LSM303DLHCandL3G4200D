@@ -1,1 +1,3 @@
 smbus-cffi
+adafruit-circuitpython-lsm303_accel
+adafruit-circuitpython-lsm303dlh_mag
