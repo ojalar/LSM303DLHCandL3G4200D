@@ -1,12 +1,48 @@
+import smbus
 import time
-import board
-import adafruit_lsm303dlh_mag
 
-i2c = board.I2C()  # uses board.SCL and board.SDA
-sensor = adafruit_lsm303dlh_mag.LSM303DLH_Mag(i2c)
+# Get I2C bus
+bus = smbus.SMBus(1)
+
+bus.write_byte_data(0x1e, 0x02, 0x00)
+bus.write_byte_data(0x1e, 0x00, 0x10)
+
+
+time.sleep(0.5)
+
 
 while True:
-    mag_x, mag_y, mag_z = sensor.magnetic
-    print('Magnetometer (gauss): ({0:10.3f}, {1:10.3f}, {2:10.3f})'.format(mag_x, mag_y, mag_z))
-    print('')
-    time.sleep(1.0)
+    # L3G4200D address, 0x68(104)
+    # Read data back from 0x28(40), 2 bytes, X-Axis LSB first
+    data0 = bus.read_byte_data(0x1e, 0x03)
+    data1 = bus.read_byte_data(0x1e, 0x04)
+
+    # Convert the data
+    xGyro = data1 * 256 + data0
+    if xGyro > 32767 :
+            xGyro -= 65536
+
+    # L3G4200D address, 0x68(104)
+    # Read data back from 0x2A(42), 2 bytes, Y-Axis LSB first
+    data0 = bus.read_byte_data(0x1e, 0x07)
+    data1 = bus.read_byte_data(0x1e, 0x08)
+
+    # Convert the data
+    yGyro = data1 * 256 + data0
+    if yGyro > 32767 :
+            yGyro -= 65536
+
+    # L3G4200D address, 0x68(104)
+    # Read data back from 0x2C(44), 2 bytes, Z-Axis LSB first
+    data0 = bus.read_byte_data(0x1e, 0x05)
+    data1 = bus.read_byte_data(0x1e, 0x06)
+
+    # Convert the data
+    zGyro = data1 * 256 + data0
+    if zGyro > 32767 :
+            zGyro -= 65536
+     
+    # Output data to screen
+    print("Rotation in X-Axis : %f" %(xGyro/32768))
+    print("Rotation in Y-Axis : %f" %(yGyro/32768))
+    print("Rotation in Z-Axis : %f" %(zGyro/32768))

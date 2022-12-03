@@ -1,12 +1,48 @@
+import smbus
 import time
-import board
-import adafruit_lsm303_accel
 
-i2c = board.I2C()  # uses board.SCL and board.SDA
-sensor = adafruit_lsm303_accel.LSM303_Accel(i2c)
+# Get I2C bus
+bus = smbus.SMBus(1)
+
+bus.write_byte_data(0x19, 0x20, 0x27)
+bus.write_byte_data(0x19, 0x23, 0x00)
+
+
+time.sleep(0.5)
+
 
 while True:
-    acc_x, acc_y, acc_z = sensor.acceleration
-    print('Acceleration (m/s^2): ({0:10.3f}, {1:10.3f}, {2:10.3f})'.format(acc_x, acc_y, acc_z))
-    print('')
-    time.sleep(1.0)
+    # L3G4200D address, 0x68(104)
+    # Read data back from 0x28(40), 2 bytes, X-Axis LSB first
+    data0 = bus.read_byte_data(0x19, 0x28)
+    data1 = bus.read_byte_data(0x19, 0x29)
+
+    # Convert the data
+    xGyro = data1 * 256 + data0
+    if xGyro > 32767 :
+            xGyro -= 65536
+
+    # L3G4200D address, 0x68(104)
+    # Read data back from 0x2A(42), 2 bytes, Y-Axis LSB first
+    data0 = bus.read_byte_data(0x19, 0x2A)
+    data1 = bus.read_byte_data(0x19, 0x2B)
+
+    # Convert the data
+    yGyro = data1 * 256 + data0
+    if yGyro > 32767 :
+            yGyro -= 65536
+
+    # L3G4200D address, 0x68(104)
+    # Read data back from 0x2C(44), 2 bytes, Z-Axis LSB first
+    data0 = bus.read_byte_data(0x19, 0x2C)
+    data1 = bus.read_byte_data(0x19, 0x2D)
+
+    # Convert the data
+    zGyro = data1 * 256 + data0
+    if zGyro > 32767 :
+            zGyro -= 65536
+     
+    # Output data to screen
+    print("Rotation in X-Axis : %f" %(xGyro*6e-5))
+    print("Rotation in Y-Axis : %f" %(yGyro*6e-5))
+    print("Rotation in Z-Axis : %f" %(zGyro*6e-5))

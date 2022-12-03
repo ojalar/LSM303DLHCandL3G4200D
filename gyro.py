@@ -10,14 +10,7 @@ bus = smbus.SMBus(1)
 # Select Control register1, 0x20(32)
 #		0x0F(15)	Normal mode, X, Y, Z-Axis enabled
 bus.write_byte_data(0x69, 0x20, 0x0F)
-#for i in range(10000):
-#    try:
-#        bus.write_byte_data(hex(i), 0x20, 0x0F)
-#        print("success with", hex(i))
-#        time.sleep(5)
-#    except:
-#        print("....")
-#        pass
+
 # L3G4200D address, 0x68(104)
 # Select Control register4, 0x23(35)
 #		0x30(48)	Continous update, Data LSB at lower address
