@@ -1,3 +1,5 @@
+# Based on https://github.com/ControlEverythingCommunity/LSM303DLHC
+
 import smbus
 import time
 
